@@ -1,0 +1,21 @@
+schema: osera-patch-evidence/0.1.0
+producer: moderne
+release: 2.10.4.1-backpatch-00001
+baseline: v2.10.4+backpatch.baseline
+fixes:
+  - cve: CVE-2022-32287
+    upstream_fix_url: https://github.com/apache/uima-uimaj/commit/9c99e071be79bdb6bbd1bcd3f20431d76ce5143e
+    advisory_url: https://nvd.nist.gov/vuln/detail/CVE-2022-32287
+    patch_commit_url: https://github.com/moderne-backpatch-alliance/backpatch-uima-uimaj/commit/8c31109
+    basis: adapted
+    artifacts:
+      - org.apache.uima:uimaj-core
+    note: New in this release; ported onto 2.10.4; fixed at 2.10.4.1-backpatch-00001 (backpatch-uima-uimaj@8c31109).
+tests:
+  commit: 8c311094b7c02bf91da84d016b0611dc9ff36307
+  command: mvn -B -T1 -pl uimaj-core -am -Dmaven.test.failure.ignore=true clean test
+  runtime: openjdk version 1.8.0_382, Apache Maven 3.9.16
+  report: uimaj-core-2.10.4.1-backpatch-00001-tests.zip
+  report_sha256: 63e720a5867a8308d5c5b4c8899bba25b987cb8896261148b70fb553f612922e
+  result: pass
+  note: "532 tests at the patch commit, 0 of them skipped by the suite, 0 failed, 0 errors. Accepted verifier finding A: the generated UimaVersion source of uimaj-core 2.10.4 is not in the tree (written at build time); no source this port changes."
