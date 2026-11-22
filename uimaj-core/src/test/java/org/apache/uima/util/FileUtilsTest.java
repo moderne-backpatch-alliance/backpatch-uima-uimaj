@@ -18,8 +18,14 @@
  */
 package org.apache.uima.util;
 
+import static org.apache.uima.pear.util.FileUtil.extractFilesFromJar;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import junit.framework.TestCase;
 
@@ -60,5 +66,28 @@ public class FileUtilsTest extends TestCase {
     assertEquals(text, FileUtils.file2String(tmpFile2, utf8));
     
     FileUtils.deleteRecursive(tmpDir);
+  }
+
+  public void testThatAllFilesGoToTargetFolder() throws Exception {
+    File tmpDir = FileUtils.createTempDir(new File(System.getProperty("java.io.tmpdir")),
+            "fileUtilsTest");
+    try {
+      File zipFile = new File(tmpDir, "test.zip");
+
+      try (ZipOutputStream oStream = new ZipOutputStream(new FileOutputStream(zipFile))) {
+        ZipEntry zipEntry = new ZipEntry("../whoops.txt");
+        oStream.putNextEntry(zipEntry);
+      }
+
+      File target = new File(tmpDir, "target");
+      try (JarFile jarFile = new JarFile(zipFile)) {
+        extractFilesFromJar(jarFile, target);
+        fail("Expected IOException");
+      } catch (IOException e) {
+        assertTrue(e.getMessage(), e.getMessage().contains("Can only write within target folder"));
+      }
+    } finally {
+      FileUtils.deleteRecursive(tmpDir);
+    }
   }
 }
